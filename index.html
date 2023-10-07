@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Viewer</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- linear measurment -->
+    <link rel="stylesheet" href="resources/css/linearMeasurements.css">
+    <!-- Custom style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="main">
+        <div class="d-flex p-2 m-auto bg-dark justify-content-center">
+            <div class="d-flex" style="flex-direction: column; margin-right: 5px;">
+                <label for="connected" id="connected" class="text-success">Connesso</label>
+                <label for="notConnected" id="notConnected" class="text-danger">Non connesso</label>
+            </div>
+            <input type="text" id="ngLink" class="form form-control" style="width: 50%;" placeholder="Inserisci link della giocata">
+            <button id="btnSearch" type="button" class="btn btn-primary" style="margin-left: 10px;">Ricerca <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></button>
+        </div>
+        <div id="map"></div>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <!-- leaflet-providers -->
+    <script src="resources/js/leaflet-providers.js"></script>
+    <!-- linear measurements -->
+    <script src="resources/js/linearMeasurements.js"></script>
+
+    <script src="main.js"></script>
+</body>
+</html>
