@@ -3,7 +3,6 @@ var dynamicInterval;
 var osmMap = L.tileLayer.provider('OpenStreetMap.Mapnik');
 var topoMap = L.tileLayer.provider('OpenTopoMap');
 var imageryMap = L.tileLayer.provider('Esri.WorldImagery');
-var geoJsonPoints = [];
 var listaMarker = [];
 
 var baseMaps = {
@@ -91,6 +90,22 @@ function buildMap(lat, lon){
     }).addTo(map);
     yourPositionMarker.bindPopup("Tu sei qui")
 
+    // Esporta Markers
+    $(document).on('click', '#export', function(){
+        var exportMarkers = [];
+        listaMarker.forEach(el => {
+            var parsed = JSON.stringify(exportMarker(el));
+            exportMarkers.push(parsed);
+        })
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:attachment/text,' + '['+encodeURI(exportMarkers)+']';
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'markers.txt';
+        hiddenElement.click();
+    })
+
+    // Importa markers
+    document.getElementById('importa').addEventListener('change', readSingleFile, false);
 }
 
 function addDynamicMarkers(lista){
@@ -202,6 +217,7 @@ function addMarkerBtn(){
                     <div>
                         <label>${markerTitle}</label><br>
                         <label>${desrizioneMarker}</label><br>
+                        <label style="margin-right: 5px;"><b>${utmLat}</b></label><label><b>${utmLon}</b></label><br>
                         <button type="button" referrer="${markerTitle}" class="deleteMarker btn btn-danger mt-2">Cancella</button>
                     </div>
                     `
@@ -215,12 +231,14 @@ function addMarkerBtn(){
                     <div>
                         <label>${markerTitle}</label><br>
                         <label>${desrizioneMarker}</label><br>
+                        <label style="margin-right: 5px;"><b>${utmLat}</b></label><label><b>${utmLon}</b></label><br>
                         <button type="button" referrer="${markerTitle}" class="deleteMarker btn btn-danger mt-2">Cancella</button>
                     </div>
                     `
                     ).addTo(map)
                 }
                 listaMarker.push(marker);
+                $('#modalAddMarker').fadeOut();
             } else {
                 alert('Inserire nome del marker');
             }
@@ -232,7 +250,7 @@ function addMarkerBtn(){
         listaMarker.forEach(el => {
             if (el.options.title == nomeMarker){
                 map.removeLayer(el);
-                listaMarker.splice(listaMarker.indexOf(listaMarker[el]), 1)
+                listaMarker.splice(listaMarker.indexOf(el), 1)
             }
         })
     })
@@ -242,7 +260,6 @@ function createMekerOnClick(){
     map.on('click', onMapClick);
     function onMapClick(e){
         $('#modalAddMarker').fadeIn();
-        console.log(e);
         var LL = new LatLng(e.latlng.lat, e.latlng.lng);
         var UTM = LL.toUTMRef();
         $('#utmLat').val(UTM.easting.toString().split('.')[0]);
@@ -261,21 +278,50 @@ function checkExistingName(nome){
     return exists
 }
 
-function getCircularReplacer() {
-    const ancestors = [];
-    return function (key, value) {
-      if (typeof value !== "object" || value === null) {
-        return value;
-      }
-      // `this` is the object that value is contained in,
-      // i.e., its direct parent.
-      while (ancestors.length > 0 && ancestors.at(-1) !== this) {
-        ancestors.pop();
-      }
-      if (ancestors.includes(value)) {
-        return "[Circular]";
-      }
-      ancestors.push(value);
-      return value;
+function exportMarker(marker){
+    var type;
+    !marker.options.radius ? type = "point" : type = "circle"
+    var exportedMarker = {
+        type: type,
+        latlng: marker._latlng,
+        popup: marker._popup._content,
+        title: marker.options.title,
+        draggable: marker.options.draggable,
+        options: marker.options
+    }
+    return(exportedMarker);
+}
+
+function readSingleFile(e) {
+    var file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var contents = e.target.result;
+      renderPoints(contents);
     };
-  }
+    reader.readAsText(file);
+}
+  
+function renderPoints(contents) {
+    console.log(contents);
+    var listaPunti = JSON.parse(contents);
+    console.log(listaPunti);
+    listaPunti.forEach(el => {
+        if (el.type == "point"){
+            var marker = L.marker([el.latlng.lat, el.latlng.lng], {
+                draggable: el.draggable,
+                title: el.title
+            }).bindPopup(el.popup).addTo(map);
+        } else if (el.type == "circle"){
+            var marker = L.circle([el.latlng.lat, el.latlng.lng], {
+                draggable: el.draggable,
+                title: el.title,
+                radius: el.options.radius
+            }).bindPopup(el.popup).addTo(map);
+        }
+        listaMarker.push(marker);
+    })
+}

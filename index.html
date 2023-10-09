@@ -27,8 +27,9 @@
             </div>
             <input type="text" id="ngLink" class="form form-control" style="width: 50%;" placeholder="Inserisci link della giocata">
             <button id="btnSearch" type="button" class="btn btn-primary" style="margin-left: 10px;">Ricerca <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></button>
-            <!-- <button id="export" type="button" class="btn btn-primary" style="margin-left: 10px;" title="Esporta punti"><i class="fa-solid fa-file-export"></i></button> -->
-            <!-- <button id="export" type="button" class="btn btn-primary" style="margin-left: 10px;" title="Importa punti"><i class="fa-solid fa-folder-open"></i></button> -->
+            <button id="export" type="button" class="btn btn-primary" style="margin-left: 10px;" title="Esporta punti"><i class="fa-solid fa-file-export"></i></button>
+            <input type="file" id="importa" class="btn btn-primary" style="margin-left: 10px;">
+            <!-- <button id="import" type="button" class="btn btn-primary" style="margin-left: 10px;" title="Importa punti"><i class="fa-solid fa-folder-open"></i></button> -->
         </div>
         <div id="map"></div>
         
@@ -60,7 +61,7 @@
                     <input type="text" id="descrizioneMarker" class="form form-control">
                     <div id="divRaggioMarker">
                         <label for="raggioMarker">Raggio (m)</label>
-                        <input type="number" id="raggioMarker" class="form form-control">
+                        <input type="number" id="raggioMarker" class="form form-control" min="10">
                     </div>
                   </div>
                 </div>
