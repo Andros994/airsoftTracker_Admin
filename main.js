@@ -259,6 +259,9 @@ function addMarkerBtn(){
 function createMekerOnClick(){
     map.on('click', onMapClick);
     function onMapClick(e){
+        if ($('.icon-ruler').attr("class").includes("icon-active")){
+            return;
+        }
         $('#modalAddMarker').fadeIn();
         var LL = new LatLng(e.latlng.lat, e.latlng.lng);
         var UTM = LL.toUTMRef();
