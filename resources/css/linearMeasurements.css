@@ -6,6 +6,12 @@
     cursor: pointer;
     background-image: url('data:image/png; base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADVSURBVCiRndIxSkMBEIThb18eSLCwV7DRIiRH8AZaWtnYeQIPINhbWIh9Kg+hCN4hEQsLUawsRBFEhLXZgEgUngvT/bOzDBuZqes0nR1dTRHRQPsH0McAw9IIlzhuC+hh7QewjEdco4dTbEMTEQOc4xBbuMcrdrGEE6ziCusVYBEXWKj4Po5q+0ZmmgljDNrMfIuIp9q2g/fM3I+IwENEbNa5w2JWIjNFxAHucFvAqEp4wRST0k1mfszam2LvG3CGSWY+z222ktrM/Pyt/rmmrvOvN/oCjRNGEaC8yE0AAAAASUVORK5CYII=') !important;
   }
+
+  .icon-addMarker {
+    cursor: pointer;
+    background-image: url('https://cdn-icons-png.flaticon.com/128/2901/2901609.png');
+    background-size: contain;
+  }
   
   .ruler-map {
     cursor: crosshair !important;

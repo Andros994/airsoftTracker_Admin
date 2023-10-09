@@ -3,6 +3,8 @@ var dynamicInterval;
 var osmMap = L.tileLayer.provider('OpenStreetMap.Mapnik');
 var topoMap = L.tileLayer.provider('OpenTopoMap');
 var imageryMap = L.tileLayer.provider('Esri.WorldImagery');
+var geoJsonPoints = [];
+var listaMarker = [];
 
 var baseMaps = {
     OSM: osmMap,
@@ -24,9 +26,13 @@ $(document).ready(function(){
 })
 
 function initialize(){
+    // Nascondo gli elementi del caso
+    $('#modalAddMarker').hide();
     $('#spinner').hide();
     $('#connected').hide();
     $('#notConnected').hide();
+    $('#divRaggioMarker').hide();
+
     if ("geolocation" in navigator){
         navigator.geolocation.getCurrentPosition(
             // Successo nel trovare la tua posizione
@@ -47,12 +53,23 @@ function initialize(){
 
 function buildMap(lat, lon){
 
+    var LLcurrent = new LatLng(lat, lon);
+    var UTMcurrent = LLcurrent.toUTMRef();
+    $('#utmLat').val(UTMcurrent.easting.toString().split('.')[0]);
+    $('#utmLon').val(UTMcurrent.northing.toString().split('.')[0]);
+
     map = L.map('map', {
         center: [lat, lon],
         zoom: 13,
         layers: [osmMap]
     });
 
+    // button for adding markers
+    addMarkerBtn();
+
+    createMekerOnClick();
+    
+    // add linear measurement tool
     map.addControl(new L.Control.LinearMeasurement({
         unitSystem: 'metric',
         color: '#FF0080',
@@ -74,11 +91,6 @@ function buildMap(lat, lon){
     }).addTo(map);
     yourPositionMarker.bindPopup("Tu sei qui")
 
-    //? Se vogliamo leggere dei geoJSON da inserire su mappa
-    // $.getJson("link", function(data){
-    //     L.geoJSON(data).addTo(map)
-    // })
-    // setInterval(initialize(link), 60000);
 }
 
 function addDynamicMarkers(lista){
@@ -140,3 +152,130 @@ function getDynamicPosition(link){
         }
     });
 }
+
+function addMarkerBtn(){
+    var addMarker = `
+    <div class="leaflet-control leaflet-bar">
+        <a id="addMarker" class="icon-addMarker" href="#" title="Aggiungi marker"></a>
+    </div>
+    `;
+    $('.leaflet-top:eq(0)').append(addMarker);
+
+    $('#addMarker').on('click', function(){
+        $('#modalAddMarker').fadeIn();
+    })
+
+    $('#closeModalMarker').on('click', function(){
+        $('#modalAddMarker').fadeOut();
+    })
+
+    $('#tipoMarker').on('change', function(){
+        if (this.value == 'cerchio'){
+            $('#divRaggioMarker').fadeIn();
+        } else {
+            $('#divRaggioMarker').fadeOut();
+        }
+    })
+
+    $('#salvaMarkerBtn').on('click', function(){
+        var utmLat = $('#utmLat').val();
+        var utmLon = $('#utmLon').val();
+        var markerTitle = $('#nomeMarker').val();
+        var desrizioneMarker = $('#descrizioneMarker').val();
+        var tipoMarker = $('#tipoMarker option:selected').val();
+        var raggioCerchio = '';
+        tipoMarker == "cerchio" ? raggioCerchio = $('#raggioMarker').val() : '';
+        if (utmLat.length != 6 || utmLon.length != 7){
+            alert("Lunghezza coordinate errata");
+        } else {
+            if (markerTitle != ''){
+                if (checkExistingName(markerTitle) == true) {
+                    return
+                };
+                var utmMarker = new UTMRef(utmLat, utmLon, "N", "33");
+                var llMarker = utmMarker.toLatLng();
+                if (tipoMarker == "punto"){             // Marker tipo punto
+                    var marker = L.marker([llMarker.lat, llMarker.lng], {
+                        draggable: false,
+                        title: markerTitle
+                    }).bindPopup(`
+                    <div>
+                        <label>${markerTitle}</label><br>
+                        <label>${desrizioneMarker}</label><br>
+                        <button type="button" referrer="${markerTitle}" class="deleteMarker btn btn-danger mt-2">Cancella</button>
+                    </div>
+                    `
+                    ).addTo(map);
+                } else if (tipoMarker == 'cerchio'){    // Marker tipo cerchio
+                    var marker = L.circle([llMarker.lat, llMarker.lng], {
+                        draggable: false,
+                        title: markerTitle,
+                        radius: raggioCerchio
+                    }).bindPopup(`
+                    <div>
+                        <label>${markerTitle}</label><br>
+                        <label>${desrizioneMarker}</label><br>
+                        <button type="button" referrer="${markerTitle}" class="deleteMarker btn btn-danger mt-2">Cancella</button>
+                    </div>
+                    `
+                    ).addTo(map)
+                }
+                listaMarker.push(marker);
+            } else {
+                alert('Inserire nome del marker');
+            }
+        }
+    })
+
+    $(document).on('click', '.deleteMarker', function(){
+        nomeMarker = $(this).attr('referrer');
+        listaMarker.forEach(el => {
+            if (el.options.title == nomeMarker){
+                map.removeLayer(el);
+                listaMarker.splice(listaMarker.indexOf(listaMarker[el]), 1)
+            }
+        })
+    })
+}
+
+function createMekerOnClick(){
+    map.on('click', onMapClick);
+    function onMapClick(e){
+        $('#modalAddMarker').fadeIn();
+        console.log(e);
+        var LL = new LatLng(e.latlng.lat, e.latlng.lng);
+        var UTM = LL.toUTMRef();
+        $('#utmLat').val(UTM.easting.toString().split('.')[0]);
+        $('#utmLon').val(UTM.northing.toString().split('.')[0]);
+    }
+}
+
+function checkExistingName(nome){
+    var exists = false
+    listaMarker.forEach(el => {
+        if (el.options.title == nome){
+            alert("Nome già un uso")
+            exists = true
+        }
+    })
+    return exists
+}
+
+function getCircularReplacer() {
+    const ancestors = [];
+    return function (key, value) {
+      if (typeof value !== "object" || value === null) {
+        return value;
+      }
+      // `this` is the object that value is contained in,
+      // i.e., its direct parent.
+      while (ancestors.length > 0 && ancestors.at(-1) !== this) {
+        ancestors.pop();
+      }
+      if (ancestors.includes(value)) {
+        return "[Circular]";
+      }
+      ancestors.push(value);
+      return value;
+    };
+  }
