@@ -42,7 +42,8 @@ function initialize(){
             },
             (error) => {
                 alert("Errore nel calcolo della posizione", error)
-            }
+            },
+            {maximumAge:10000, timeout:5000, enableHighAccuracy: true}
         )
     } else {
         alert("Questo browser non supporta la geolocalizzazione");
@@ -198,9 +199,10 @@ function addMarkerBtn(){
         var markerTitle = $('#nomeMarker').val();
         var desrizioneMarker = $('#descrizioneMarker').val();
         var tipoMarker = $('#tipoMarker option:selected').val();
+        var coloreMarker = $('#coloreMarker').val();
         var raggioCerchio = '';
         tipoMarker == "cerchio" ? raggioCerchio = $('#raggioMarker').val() : '';
-        if (utmLat.length != 6 || utmLon.length != 7){
+        if (utmLat.replaceAll(' ','').length != 6 || utmLon.replaceAll(' ','').length != 7){
             alert("Lunghezza coordinate errata");
         } else {
             if (markerTitle != ''){
@@ -209,10 +211,36 @@ function addMarkerBtn(){
                 };
                 var utmMarker = new UTMRef(utmLat, utmLon, "N", "33");
                 var llMarker = utmMarker.toLatLng();
+
+                var markerUrl = 'images/marker_red.png';
+                switch (coloreMarker){
+                    case 'red':
+                        markerUrl = 'images/marker_red.png'
+                        break;
+                    case 'blue':
+                        markerUrl = 'images/marker_blue.png'
+                        break;
+                    case 'green':
+                        markerUrl = 'images/marker_green.png'
+                        break;
+                    case 'yellow':
+                        markerUrl = 'images/marker_yellow.png'
+                        break;
+                    default:
+                        markerUrl = 'images/marker_red'
+
+                }
+
+                var markerIcon = L.icon({
+                    iconUrl: markerUrl,
+                    iconSize: [40, 40]
+                })
+
                 if (tipoMarker == "punto"){             // Marker tipo punto
                     var marker = L.marker([llMarker.lat, llMarker.lng], {
                         draggable: false,
-                        title: markerTitle
+                        title: markerTitle,
+                        icon: markerIcon
                     }).bindPopup(`
                     <div>
                         <label>${markerTitle}</label><br>
@@ -226,7 +254,8 @@ function addMarkerBtn(){
                     var marker = L.circle([llMarker.lat, llMarker.lng], {
                         draggable: false,
                         title: markerTitle,
-                        radius: raggioCerchio
+                        radius: raggioCerchio,
+                        color: coloreMarker
                     }).bindPopup(`
                     <div>
                         <label>${markerTitle}</label><br>
@@ -238,7 +267,7 @@ function addMarkerBtn(){
                     ).addTo(map)
                 }
                 listaMarker.push(marker);
-                $('#modalAddMarker').fadeOut();
+                // $('#modalAddMarker').fadeOut();
             } else {
                 alert('Inserire nome del marker');
             }
@@ -309,14 +338,17 @@ function readSingleFile(e) {
 }
   
 function renderPoints(contents) {
-    console.log(contents);
     var listaPunti = JSON.parse(contents);
-    console.log(listaPunti);
     listaPunti.forEach(el => {
         if (el.type == "point"){
+            var markerIcon = L.icon({
+                iconUrl: el.options.icon.options.iconUrl,
+                iconSize: el.options.icon.options.iconSize
+            })
             var marker = L.marker([el.latlng.lat, el.latlng.lng], {
                 draggable: el.draggable,
-                title: el.title
+                title: el.title,
+                icon: markerIcon
             }).bindPopup(el.popup).addTo(map);
         } else if (el.type == "circle"){
             var marker = L.circle([el.latlng.lat, el.latlng.lng], {

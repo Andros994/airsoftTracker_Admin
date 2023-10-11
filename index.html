@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map Viewer</title>
 
+    <link rel="icon" href="images/youAreHere.png">
+
     <!-- Fontawesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Bootstrap -->
@@ -55,6 +57,13 @@
                         <input id="utmLat" type="text" class="form col-5" style="margin-right: 5px;">
                         <input id="utmLon" type="text" class="form col-5">
                     </div>
+                    <label for="coloreMarker">Colore</label>
+                    <select name="coloreMarker" id="coloreMarker" class="form-control">
+                      <option value="red" selected>Rosso</option>
+                      <option value="blue">Blu</option>
+                      <option value="green">Verde</option>
+                      <option value="yellow">Giallo</option>
+                    </select>
                     <label for="nomeMarker">Nome</label>
                     <input type="text" id="nomeMarker" class="form form-control">
                     <label for="descrizioneMarker">Descrizione</label>
@@ -85,7 +94,6 @@
     <!-- linear measurements -->
     <script src="resources/js/linearMeasurements.js"></script>
     <!-- lat/lon to UTM conversion -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js"></script> -->
     <script src="resources/js/jscoord-1.1.1.js"></script>
 
     <script src="main.js"></script>
